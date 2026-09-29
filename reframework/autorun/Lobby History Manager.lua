@@ -30,26 +30,37 @@ local UI_TEXT = {
 local UI_TABLE_HEADERS = { UI_TEXT.LOCK, UI_TEXT.LOBBY_ID, UI_TEXT.LANGUAGE, UI_TEXT.JOINED_AT, UI_TEXT.DELETE_HEADER }
 local UI_COLUMN_WIDTH  = {}
 
+local function arrayCount(ary)
+    if (type(ary) ~= "table") then return 0 end
+
+    local count = 0
+    for _ in pairs(ary) do 
+        count = count + 1 
+    end
+    return count
+end
+
 local function arrayIsEqual(a, b)
     if (type(a) ~= "table") or (type(b) ~= "table") then return false end
-    if #a ~= #b                                     then return false end
+    if arrayCount(a) ~= arrayCount(b)               then return false end
     for key, value in pairs(a) do
-        if type(value) == "table" then 
+        if (type(value) == "table") then 
             if not arrayIsEqual(value, b[key]) then return false end
-        elseif b[key]  ~= value                then return false end
+        elseif (b[key]  ~= value)              then return false end
     end
     for key in pairs(b) do 
-        if a[key] == nil then return false end
+        if (a[key] == nil) then return false end
     end
     return true
 end
 
 local function arrayDeepCopy(from)
     local ary = {}
-    if not from              then return ary  end
-    if type(from) ~= "table" then return from end
+    if (from == nil)           then return ary  end
+    if (type(from) ~= "table") then return from end
     for key, value in pairs(from) do 
-        ary[key] = (type(value) == "table") and arrayDeepCopy(value) or value 
+        if (type(value) == "table") then ary[key] = arrayDeepCopy(value) 
+        else                             ary[key] = value                end
     end
     return ary
 end
